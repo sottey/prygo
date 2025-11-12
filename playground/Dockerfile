@@ -18,14 +18,14 @@ RUN strip /usr/local/go/pkg/tool/linux_amd64/*
 
 WORKDIR /go/src/app
 COPY . .
+WORKDIR /go/src/app/playground
 
-RUN CGO_ENABLED=0 go get ./server
 RUN CGO_ENABLED=0 go build -ldflags "-s -w" -o playground ./server
-RUN rm -r /go/src/github.com /go/src/golang.org /go/bin
+RUN rm -rf /go/src/github.com /go/src/golang.org /go/bin
 RUN rm -r /root
 
 EXPOSE 8080
-CMD ["/go/src/app/playground"]
+CMD ["./playground"]
 
 #WORKDIR /go/src/app
 #COPY . .

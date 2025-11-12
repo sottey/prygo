@@ -1,0 +1,6 @@
+.git
+.gocache
+dist
+playground/bundles
+playground/node_modules
+playground/genmeta
