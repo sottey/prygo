@@ -13,7 +13,7 @@ RUN rm -r /usr/share
 RUN find /usr/local/go/src -name "testdata" -exec rm -r {} +
 RUN if [ -d /usr/lib/python2.7 ]; then find /usr/lib/python2.7 -name "*.pyo" -exec rm -r {} +; fi
 RUN if [ -d /usr/lib/python2.7 ]; then find /usr/lib/python2.7 -name "*.pyc" -exec rm -r {} +; fi
-RUN rm -r /usr/local/go/pkg/linux_amd64
+RUN if [ -d /usr/local/go/pkg/linux_amd64 ]; then rm -r /usr/local/go/pkg/linux_amd64; fi
 RUN strip /usr/local/go/pkg/tool/linux_amd64/*
 
 WORKDIR /go/src/app
