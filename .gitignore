@@ -5,3 +5,4 @@ fuzz/
 prygo-test*
 go-pry
 prygo
+state_tracking/***
