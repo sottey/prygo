@@ -1,6 +1,6 @@
 module github.com/sottey/prygo
 
-go 1.25.4
+go 1.25
 
 require (
 	github.com/cenkalti/backoff v2.2.1+incompatible
