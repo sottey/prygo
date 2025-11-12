@@ -48,6 +48,7 @@ func run() error {
 		fmt.Println("prygo is an interactive REPL and wrapper around the go command.")
 		fmt.Println("You can execute go commands as normal and prygo will take care of generating the pry code.")
 		fmt.Println("Running prygo with no arguments will drop you into an interactive REPL.")
+		fmt.Println("Docs & workflow examples: https://github.com/sottey/prygo/blob/master/examples.md")
 		flag.PrintDefaults()
 		fmt.Println("  revert: cleans up prygo generated files if not automatically done")
 	}

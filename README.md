@@ -53,6 +53,7 @@ is not installed in your system
 go get -u github.com/nsf/gocode
 ```
 
+More details are available in [examples.md](examples.md)
 
 ## How does it work?
 prygo is built using a combination of meta programming as well as a massive amount of reflection. When you invoke the prygo command it looks at the Go files in the mentioned directories (or the current in cases such as `prygo build`) and processes them. Since Go is a compiled language there's no way to dynamically get in scope variables, and even if there was, unused imports would be automatically removed for optimization purposes. Thus, prygo has to find every instance of `pry.Pry()` and inject a large blob of code that contains references to all in scope variables and functions as well as those of the imported packages. When doing this it makes a copy of your file to `.<filename>.gopry` and modifies the `<filename>.go` then passes the command arguments to the standard `go` command. Once the command exits, it restores the files.
