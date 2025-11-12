@@ -18,7 +18,6 @@ require (
 require (
 	github.com/felixge/httpsnoop v1.0.3 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
-	github.com/nsf/gocode v0.0.0-20230322162601-b672b49f3818 // indirect
 	golang.org/x/mod v0.29.0 // indirect
 	golang.org/x/sync v0.17.0 // indirect
 	golang.org/x/sys v0.37.0 // indirect
