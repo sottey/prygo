@@ -1,5 +1,6 @@
 module github.com/sottey/prygo
 
+// Pinned via env
 go 1.25
 
 require (
