@@ -11,8 +11,8 @@ RUN rm -r /usr/local/go/misc
 RUN rm -r /usr/local/go/test
 RUN rm -r /usr/share
 RUN find /usr/local/go/src -name "testdata" -exec rm -r {} +
-RUN find /usr/lib/python2.7 -name "*.pyo" -exec rm -r {} +
-RUN find /usr/lib/python2.7 -name "*.pyc" -exec rm -r {} +
+RUN if [ -d /usr/lib/python2.7 ]; then find /usr/lib/python2.7 -name "*.pyo" -exec rm -r {} +; fi
+RUN if [ -d /usr/lib/python2.7 ]; then find /usr/lib/python2.7 -name "*.pyc" -exec rm -r {} +; fi
 RUN rm -r /usr/local/go/pkg/linux_amd64
 RUN strip /usr/local/go/pkg/tool/linux_amd64/*
 
