@@ -26,20 +26,12 @@ RUN strip /usr/local/go/pkg/tool/linux_amd64/*
 
 WORKDIR /go/src/app
 COPY . .
-RUN go install ./...
 
 WORKDIR /go/src/app/playground
 
 COPY --from=web-deps /app/node_modules ./node_modules
 RUN mv /tmp/wasm_exec.js ./wasm_exec.js
-
-RUN set -eux; \
-    rm -rf bundles && mkdir -p bundles; \
-    prygo -generate="bundles/main.go" -i="fmt,log,math" -e='log.Println("Hello world!")'; \
-    GOOS=js GOARCH=wasm go build -ldflags "-s -w" -o bundles/main.wasm bundles/main.go; \
-    prygo -generate="bundles/stdlib.go" -i="$(tr '\n' ',' < packages.txt)" -e='log.Println("Hello world!")'; \
-    GOOS=js GOARCH=wasm go build -ldflags "-s -w" -o bundles/stdlib.wasm bundles/stdlib.go; \
-    rm bundles/*.go
+RUN mkdir -p bundles
 
 RUN CGO_ENABLED=0 go build -ldflags "-s -w" -o playground ./server
 RUN rm -rf /go/src/github.com /go/src/golang.org /go/bin

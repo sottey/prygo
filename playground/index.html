@@ -58,10 +58,10 @@
 
       <h2>prygo import bundles</h2>
       <ul>
-	<li><a href="/">just fmt,log,math</a></li>
+	<li><a href="/?packages=fmt,log,math">just fmt,log,math</a></li>
 	<li>
-	  <a href="/?file=bundles/stdlib.wasm">full standard library</a>
-	  (~37MB, will take longer to load)
+	  <a href="/?packages=stdlib">full standard library</a>
+	  (generated on demand, will take longer to load)
 	</li>
       </ul>
     </div>
@@ -75,8 +75,31 @@
     <script src="wasm_exec.js"></script>
     <script>
 
-      const file = (new URL(document.location)).searchParams.get('file')
-      const wasm = fetch(file || "bundles/main.wasm")
+      const pageUrl = new URL(document.location)
+      const params = pageUrl.searchParams
+      const defaultPackages = "fmt,log,math"
+      const file = params.get('file')
+      const packagesParam = params.get('packages')
+
+      async function resolvePackages(value) {
+	if (!value) {
+	  return defaultPackages
+	}
+	if (value === "stdlib") {
+	  const response = await fetch("packages.txt")
+	  const text = await response.text()
+	  return text.split("\n").map((line) => line.trim()).filter(Boolean).join(",")
+	}
+	return value
+      }
+
+      const wasm = (async () => {
+	if (file) {
+	  return fetch(file)
+	}
+	const pkgList = await resolvePackages(packagesParam)
+	return fetch(`/wasm?packages=${encodeURIComponent(pkgList)}`)
+      })()
 
       document.fonts.ready.then(() => {
 	const term = new Terminal({

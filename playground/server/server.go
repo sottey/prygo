@@ -98,13 +98,22 @@ func generateBundle(w http.ResponseWriter, r *http.Request, packages string) (re
 func run() error {
 	log.SetFlags(log.Flags() | log.Lshortfile)
 
+	if err := os.MkdirAll(bundlesDir, 0o755); err != nil {
+		return errors.Wrap(err, "create bundles dir")
+	}
+
 	router := mux.NewRouter()
-	router.PathPrefix("/wasm/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		pkgs := strings.Join(strings.Split(r.URL.Path, "/")[2:], "/")
+	wasmHandler := func(w http.ResponseWriter, r *http.Request) {
+		pkgs := r.URL.Query().Get("packages")
+		if pkgs == "" {
+			pkgs = strings.Trim(strings.TrimPrefix(r.URL.Path, "/wasm/"), "/")
+		}
 		if err := generateBundle(w, r, pkgs); err != nil {
 			http.Error(w, fmt.Sprintf("%+v", err), http.StatusInternalServerError)
 		}
-	})
+	}
+	router.HandleFunc("/wasm", wasmHandler)
+	router.PathPrefix("/wasm/").HandlerFunc(wasmHandler)
 	router.NotFoundHandler = http.FileServer(http.Dir("."))
 
 	log.Printf("Listening %s...", *bind)
