@@ -64,6 +64,10 @@ If the program unexpectedly fails there is a custom command `prygo restore [file
 
 See [examples.md](examples.md) for a guided tour covering installation, standalone REPL usage, common debugging workflows, and tips for first-time users.
 
+### Working Outside the Module Root
+
+prygo writes temporary modules whenever it needs to run code in a scratch directory (for example, the standalone REPL). It inspects your project’s `go.mod` to copy the `go`/`toolchain` directives, so builds use the same toolchain as your main module. If prygo cannot automatically locate your module root—for instance when you run from a nested example directory—set `PRYGO_MODULE_ROOT=/absolute/path/to/your/module` before invoking prygo. That tells prygo exactly which `go.mod` to mirror and which local replace directives to apply.
+
 ## Inspiration
 
 prygo is greatly inspired by [Pry REPL](http://pryrepl.org) for Ruby.
