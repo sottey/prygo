@@ -2,6 +2,13 @@
 
 prygo - an interactive REPL for Go that allows you to drop into your code at any point.
 
+This repository is an actively maintained continuation of Tristan Rice’s original project. The fork keeps pace with modern Go toolchains (Go 1.25+) and focuses on reliability in large modules:
+
+- **Toolchain-aware temp modules** – prygo mirrors your project’s `go`/`toolchain` directives inside scratch workspaces, so `go run` no longer fails with “go mod tidy” or toolchain mismatch errors.
+- **Safer import handling** – generated files automatically reference every requested package (including interfaces), preventing “unused import” panics when you drop into the REPL.
+- **Improved module discovery** – prygo detects the active module root (or uses `PRYGO_MODULE_ROOT`) so local development uses your checked-out sources without manual replace directives.
+- **Up-to-date dependencies & CI** – the module file, GitHub Actions, and tests are refreshed for current Go releases, and failing example binaries are opt-in only.
+
 ![Tests](https://github.com/sottey/prygo/actions/workflows/unittest.yml/badge.svg)
 [![GoDoc](https://godoc.org/github.com/sottey/prygo/pry?status.svg)](https://godoc.org/github.com/sottey/prygo/pry)
 
@@ -18,9 +25,7 @@ Example
 
 Install prygo
 ```bash
-go get github.com/sottey/prygo
-go install -i github.com/sottey/prygo
-
+go install github.com/sottey/prygo@latest
 ```
 
 Add the pry statement to the code
@@ -54,6 +59,10 @@ prygo is built using a combination of meta programming as well as a massive amou
 
 If the program unexpectedly fails there is a custom command `prygo restore [files]` that will move the files back. An alternative is to just remove the `pry.Apply(...)` line.
 
+## Examples & Tutorials
+
+See [examples.md](examples.md) for a guided tour covering installation, standalone REPL usage, common debugging workflows, and tips for first-time users.
+
 ## Inspiration
 
 prygo is greatly inspired by [Pry REPL](http://pryrepl.org) for Ruby.
@@ -62,4 +71,6 @@ prygo is greatly inspired by [Pry REPL](http://pryrepl.org) for Ruby.
 
 prygo is licensed under the MIT license.
 
-Made by [Tristan Rice](https://fn.lc).
+prygo was refactored and is maintained by [sottey](https://github.com/sottey)
+
+The original go-pry was made by [Tristan Rice](https://fn.lc).
