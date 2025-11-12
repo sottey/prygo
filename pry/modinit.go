@@ -35,6 +35,9 @@ type moduleMetadata struct {
 // of its parents already belongs to a module tree. This lets Go tooling operate
 // inside generated scratch dirs while keeping existing modules untouched.
 func ensureTempModule(dir string) error {
+	if runtime.GOOS == "js" {
+		return nil
+	}
 	hasMod, err := hasAncestorGoMod(dir)
 	if err != nil {
 		return err
