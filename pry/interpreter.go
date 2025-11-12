@@ -723,7 +723,10 @@ func (scope *Scope) Interpret(expr ast.Node) (interface{}, error) {
 				if len(value) > 0 {
 					s.Set(value, rv.Index(i).Interface())
 				}
-				s.Interpret(e.Body)
+				_, errInterpret := s.Interpret(e.Body)
+				if errInterpret != nil {
+					return nil, errInterpret
+				}
 			}
 		case reflect.Map:
 			keys := rv.MapKeys()
@@ -734,7 +737,10 @@ func (scope *Scope) Interpret(expr ast.Node) (interface{}, error) {
 				if len(value) > 0 {
 					s.Set(value, rv.MapIndex(keyV).Interface())
 				}
-				s.Interpret(e.Body)
+				_, errInterpret := s.Interpret(e.Body)
+				if errInterpret != nil {
+					return nil, errInterpret
+				}
 			}
 		default:
 			return nil, fmt.Errorf("ranging on %s is unsupported", rv.Type().Kind().String())
@@ -1023,11 +1029,14 @@ func (scope *Scope) Interpret(expr ast.Node) (interface{}, error) {
 			}
 			args = append(args, v)
 		}
-		scope.Defer(&Defer{
+		errDefer := scope.Defer(&Defer{
 			fun:       e.Call.Fun,
 			scope:     scope,
 			arguments: args,
 		})
+		if errDefer != nil {
+			return nil, errDefer
+		}
 		return nil, nil
 
 	case *ast.StructType:

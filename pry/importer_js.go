@@ -1,3 +1,4 @@
+//go:build js
 // +build js
 
 package pry
@@ -11,7 +12,7 @@ import (
 func (s *Scope) parseDir() (map[string]*ast.File, error) {
 	files := map[string]*ast.File{}
 	for _, p := range defaultImporter.Dir {
-		for name, file := range p.Files {
+		for name, file := range p {
 			files[name] = file
 		}
 	}
@@ -24,7 +25,7 @@ func getImporter() types.Importer {
 
 var defaultImporter = &JSImporter{
 	packages: map[string]*types.Package{},
-	Dir:      map[string]*ast.Package{},
+	Dir:      map[string]map[string]*ast.File{},
 }
 
 func InternalSetImports(raw string) {

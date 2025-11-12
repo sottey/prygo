@@ -11,7 +11,7 @@ import (
 // in a javascript environment.
 type JSImporter struct {
 	packages map[string]*types.Package
-	Dir      map[string]*ast.Package
+	Dir      map[string]map[string]*ast.File
 }
 
 func (i *JSImporter) Import(path string) (*types.Package, error) {

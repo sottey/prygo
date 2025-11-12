@@ -55,10 +55,12 @@ func apply(
 
 	history, err := NewHistory()
 	if err != nil {
-		fmt.Errorf("Failed to initiliaze history %+v", err)
+		errInit := fmt.Errorf("Failed to initiliaze history %+v", err)
+		return errInit
 	}
 	if err := history.Load(); err != nil {
-		fmt.Errorf("Failed to load the history %+v", err)
+		errLoad := fmt.Errorf("Failed to load the history %+v", err)
+		return errLoad
 	}
 
 	currentPos := history.Len()

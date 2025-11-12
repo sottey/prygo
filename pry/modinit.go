@@ -158,10 +158,7 @@ func parseGoModDirectives(path string) (goVersion, toolchain string) {
 }
 
 func runtimeGoSettings() (goVersion, toolchain string) {
-	version := runtime.Version()
-	if strings.HasPrefix(version, "go") {
-		version = strings.TrimPrefix(version, "go")
-	}
+	version := strings.TrimPrefix(runtime.Version(), "go")
 	if version == "" {
 		return "", ""
 	}

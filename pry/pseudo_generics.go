@@ -618,9 +618,8 @@ func ComputeBinaryOp(xI, yI interface{}, op token.Token) (interface{}, error) {
 		}
 	}
 	if isUint {
-		switch xI.(type) {
+		switch x := xI.(type) {
 		case int:
-			x := xI.(int)
 			switch op {
 			// Num, uint
 			case token.SHL:
@@ -629,7 +628,6 @@ func ComputeBinaryOp(xI, yI interface{}, op token.Token) (interface{}, error) {
 				return x >> yUint, nil
 			}
 		case int8:
-			x := xI.(int8)
 			switch op {
 			// Num, uint
 			case token.SHL:
@@ -638,7 +636,6 @@ func ComputeBinaryOp(xI, yI interface{}, op token.Token) (interface{}, error) {
 				return x >> yUint, nil
 			}
 		case int16:
-			x := xI.(int16)
 			switch op {
 			// Num, uint
 			case token.SHL:
@@ -647,7 +644,6 @@ func ComputeBinaryOp(xI, yI interface{}, op token.Token) (interface{}, error) {
 				return x >> yUint, nil
 			}
 		case int32:
-			x := xI.(int32)
 			switch op {
 			// Num, uint
 			case token.SHL:
@@ -656,7 +652,6 @@ func ComputeBinaryOp(xI, yI interface{}, op token.Token) (interface{}, error) {
 				return x >> yUint, nil
 			}
 		case int64:
-			x := xI.(int64)
 			switch op {
 			// Num, uint
 			case token.SHL:
@@ -665,7 +660,6 @@ func ComputeBinaryOp(xI, yI interface{}, op token.Token) (interface{}, error) {
 				return x >> yUint, nil
 			}
 		case uint:
-			x := xI.(uint)
 			switch op {
 			// Num, uint
 			case token.SHL:
@@ -674,7 +668,6 @@ func ComputeBinaryOp(xI, yI interface{}, op token.Token) (interface{}, error) {
 				return x >> yUint, nil
 			}
 		case uint8:
-			x := xI.(uint8)
 			switch op {
 			// Num, uint
 			case token.SHL:
@@ -683,7 +676,6 @@ func ComputeBinaryOp(xI, yI interface{}, op token.Token) (interface{}, error) {
 				return x >> yUint, nil
 			}
 		case uint16:
-			x := xI.(uint16)
 			switch op {
 			// Num, uint
 			case token.SHL:
@@ -692,7 +684,6 @@ func ComputeBinaryOp(xI, yI interface{}, op token.Token) (interface{}, error) {
 				return x >> yUint, nil
 			}
 		case uint32:
-			x := xI.(uint32)
 			switch op {
 			// Num, uint
 			case token.SHL:
@@ -701,7 +692,6 @@ func ComputeBinaryOp(xI, yI interface{}, op token.Token) (interface{}, error) {
 				return x >> yUint, nil
 			}
 		case uint64:
-			x := xI.(uint64)
 			switch op {
 			// Num, uint
 			case token.SHL:
@@ -710,7 +700,6 @@ func ComputeBinaryOp(xI, yI interface{}, op token.Token) (interface{}, error) {
 				return x >> yUint, nil
 			}
 		case uintptr:
-			x := xI.(uintptr)
 			switch op {
 			// Num, uint
 			case token.SHL:
@@ -741,15 +730,13 @@ func (scope *Scope) ComputeUnaryOp(xI interface{}, op token.Token) (interface{},
 		return reflect.ValueOf(xI).Elem().Interface(), nil
 	}
 
-	switch xI.(type) {
+	switch x := xI.(type) {
 	case bool:
-		x := xI.(bool)
 		switch op {
 		case token.NOT:
 			return !x, nil
 		}
 	case int:
-		x := xI.(int)
 		switch op {
 		case token.ADD:
 			return +x, nil
@@ -757,7 +744,6 @@ func (scope *Scope) ComputeUnaryOp(xI interface{}, op token.Token) (interface{},
 			return -x, nil
 		}
 	case int8:
-		x := xI.(int8)
 		switch op {
 		case token.ADD:
 			return +x, nil
@@ -765,7 +751,6 @@ func (scope *Scope) ComputeUnaryOp(xI interface{}, op token.Token) (interface{},
 			return -x, nil
 		}
 	case int16:
-		x := xI.(int16)
 		switch op {
 		case token.ADD:
 			return +x, nil
@@ -773,7 +758,6 @@ func (scope *Scope) ComputeUnaryOp(xI interface{}, op token.Token) (interface{},
 			return -x, nil
 		}
 	case int32:
-		x := xI.(int32)
 		switch op {
 		case token.ADD:
 			return +x, nil
@@ -781,7 +765,6 @@ func (scope *Scope) ComputeUnaryOp(xI interface{}, op token.Token) (interface{},
 			return -x, nil
 		}
 	case int64:
-		x := xI.(int64)
 		switch op {
 		case token.ADD:
 			return +x, nil
@@ -789,7 +772,6 @@ func (scope *Scope) ComputeUnaryOp(xI interface{}, op token.Token) (interface{},
 			return -x, nil
 		}
 	case uint:
-		x := xI.(uint)
 		switch op {
 		case token.ADD:
 			return +x, nil
@@ -797,7 +779,6 @@ func (scope *Scope) ComputeUnaryOp(xI interface{}, op token.Token) (interface{},
 			return -x, nil
 		}
 	case uint8:
-		x := xI.(uint8)
 		switch op {
 		case token.ADD:
 			return +x, nil
@@ -805,7 +786,6 @@ func (scope *Scope) ComputeUnaryOp(xI interface{}, op token.Token) (interface{},
 			return -x, nil
 		}
 	case uint16:
-		x := xI.(uint16)
 		switch op {
 		case token.ADD:
 			return +x, nil
@@ -813,7 +793,6 @@ func (scope *Scope) ComputeUnaryOp(xI interface{}, op token.Token) (interface{},
 			return -x, nil
 		}
 	case uint32:
-		x := xI.(uint32)
 		switch op {
 		case token.ADD:
 			return +x, nil
@@ -821,7 +800,6 @@ func (scope *Scope) ComputeUnaryOp(xI interface{}, op token.Token) (interface{},
 			return -x, nil
 		}
 	case uint64:
-		x := xI.(uint64)
 		switch op {
 		case token.ADD:
 			return +x, nil
@@ -829,7 +807,6 @@ func (scope *Scope) ComputeUnaryOp(xI interface{}, op token.Token) (interface{},
 			return -x, nil
 		}
 	case uintptr:
-		x := xI.(uintptr)
 		switch op {
 		case token.ADD:
 			return +x, nil
@@ -837,7 +814,6 @@ func (scope *Scope) ComputeUnaryOp(xI interface{}, op token.Token) (interface{},
 			return -x, nil
 		}
 	case float32:
-		x := xI.(float32)
 		switch op {
 		case token.ADD:
 			return +x, nil
@@ -845,7 +821,6 @@ func (scope *Scope) ComputeUnaryOp(xI interface{}, op token.Token) (interface{},
 			return -x, nil
 		}
 	case float64:
-		x := xI.(float64)
 		switch op {
 		case token.ADD:
 			return +x, nil
@@ -853,7 +828,6 @@ func (scope *Scope) ComputeUnaryOp(xI interface{}, op token.Token) (interface{},
 			return -x, nil
 		}
 	case complex64:
-		x := xI.(complex64)
 		switch op {
 		case token.ADD:
 			return +x, nil
@@ -861,7 +835,6 @@ func (scope *Scope) ComputeUnaryOp(xI interface{}, op token.Token) (interface{},
 			return -x, nil
 		}
 	case complex128:
-		x := xI.(complex128)
 		switch op {
 		case token.ADD:
 			return +x, nil

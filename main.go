@@ -21,7 +21,7 @@ func main() {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	go func() {
-		for _ = range c {
+		for range c {
 		}
 	}()
 
@@ -84,7 +84,7 @@ func run() error {
 	if cmdArgs[0] == "revert" {
 		fmt.Println("REVERTING PRY")
 		for _, dir := range goDirs {
-			filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+			errWalk := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 				if strings.HasSuffix(path, ".gopry") {
 					processed := false
 					for _, file := range processedFiles {
@@ -100,13 +100,18 @@ func run() error {
 				}
 				return nil
 			})
+
+			if errWalk != nil {
+				return errWalk
+			}
+
 		}
 		return g.RevertPry(modifiedFiles)
 	}
 
 	testsRequired := cmdArgs[0] == "test"
 	for _, dir := range goDirs {
-		if err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		if errFileWalk := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 			if !testsRequired && strings.HasSuffix(path, "_test.go") || !strings.HasSuffix(path, ".go") || strings.Contains(path, "vendor/") {
 				return nil
 			}
@@ -115,16 +120,16 @@ func run() error {
 					return nil
 				}
 			}
-			file, err := g.InjectPry(path)
-			if err != nil {
-				return errors.Wrap(err, "inject")
+			file, errInject := g.InjectPry(path)
+			if errInject != nil {
+				return errors.Wrap(errInject, "inject")
 			}
 			if file != "" {
 				modifiedFiles = append(modifiedFiles, path)
 			}
 			return nil
-		}); err != nil {
-			return err
+		}); errFileWalk != nil {
+			return errFileWalk
 		}
 	}
 

@@ -20,8 +20,10 @@ func TestCLIBasicStatement(t *testing.T) {
 	env := testPryApply(t)
 	defer env.Close()
 
-	env.Write([]byte("a := 10\n"))
-
+	_, errEnvWrite := env.Write([]byte("a := 10\n"))
+	if errEnvWrite != nil {
+		log.Fatalf("%+v", errEnvWrite)
+	}
 	succeedsSoon(t, func() error {
 		out, _ := env.Get("a")
 		want := 10
@@ -39,10 +41,16 @@ func TestCLIHistory(t *testing.T) {
 	env := testPryApply(t)
 	defer env.Close()
 
-	env.Write([]byte("var a int\na = 1\na = 2\na = 3\n"))
-	// down down up up up down enter
-	env.Write([]byte("\x1b\x5b\x42\x1b\x5b\x42\x1b\x5b\x41\x1b\x5b\x41\x1b\x5b\x41\x1b\x5b\x42\n"))
+	_, errEnvWrite := env.Write([]byte("var a int\na = 1\na = 2\na = 3\n"))
+	if errEnvWrite != nil {
+		log.Fatalf("%+v", errEnvWrite)
+	}
 
+	// down down up up up down enter
+	_, errEnvWrite = env.Write([]byte("\x1b\x5b\x42\x1b\x5b\x42\x1b\x5b\x41\x1b\x5b\x41\x1b\x5b\x41\x1b\x5b\x42\n"))
+	if errEnvWrite != nil {
+		log.Fatalf("%+v", errEnvWrite)
+	}
 	succeedsSoon(t, func() error {
 		out, _ := env.Get("a")
 		want := 2
@@ -60,9 +68,16 @@ func TestCLIEditingArrows(t *testing.T) {
 	env := testPryApply(t)
 	defer env.Close()
 
-	env.Write([]byte("a := 100"))
+	_, errEnvWrite := env.Write([]byte("a := 100"))
+	if errEnvWrite != nil {
+		log.Fatalf("%+v", errEnvWrite)
+	}
+
 	// left left backspace 2 right right 5 enter
-	env.Write([]byte("\x1b\x5b\x44\x1b\x5b\x44\b2\x1b\x5b\x43\x1b\x5b\x435\n"))
+	_, errEnvWrite = env.Write([]byte("\x1b\x5b\x44\x1b\x5b\x44\b2\x1b\x5b\x43\x1b\x5b\x435\n"))
+	if errEnvWrite != nil {
+		log.Fatalf("%+v", errEnvWrite)
+	}
 
 	succeedsSoon(t, func() error {
 		out, _ := env.Get("a")
@@ -167,7 +182,10 @@ func (env *testPryEnv) Output() string {
 }
 
 func (env *testPryEnv) Close() {
-	env.Write([]byte("\nexit\n"))
+	_, errEnvWrite := env.Write([]byte("\nexit\n"))
+	if errEnvWrite != nil {
+		log.Fatalf("%+v", errEnvWrite)
+	}
 	env.testTTY.Close()
 	os.RemoveAll(env.file)
 	os.RemoveAll(env.dir)

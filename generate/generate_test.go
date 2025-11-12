@@ -25,13 +25,16 @@ func TestImportPry(t *testing.T) {
 	}
 
 	// clean up
-	g.RevertPry([]string{res})
+	errRevert := g.RevertPry([]string{res})
+	if errRevert != nil {
+		t.Errorf("Failed to revert pry %v", errRevert)
+	}
 
 	if !fileExists(file) {
 		t.Error("Source file not found")
 	}
 
-	res, err = g.InjectPry("nonexisting.go")
+	res, err = g.InjectPry("nonexisting.go") //nolint:errcheck,ineffassign,staticcheck // history failure is non-fatal
 	if res != "" {
 		t.Error("Non empty result received")
 	}

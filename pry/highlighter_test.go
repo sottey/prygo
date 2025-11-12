@@ -17,7 +17,7 @@ func TestHighlightSafe(t *testing.T) {
 	fileStr := (string)(fileBytes)
 	highlight := Highlight(fileStr)
 
-	r, err := regexp.Compile("\\x1b\\[(.*?)m")
+	r, err := regexp.Compile(`\x1b\[(.*?)m`)
 	if err != nil {
 		t.Error(err)
 	}

@@ -16,7 +16,7 @@ import (
 func TestHistory(t *testing.T) {
 	t.Parallel()
 
-	rand.Seed(time.Now().UnixNano())
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	history := &ioHistory{}
 	history.FileName = ".prygo_history_test"
@@ -24,7 +24,7 @@ func TestHistory(t *testing.T) {
 
 	expected := []string{
 		"test",
-		fmt.Sprintf("rand: %d", rand.Int63()),
+		fmt.Sprintf("rand: %d", r.Int63()),
 	}
 	history.Add(expected[0])
 	history.Add(expected[1])

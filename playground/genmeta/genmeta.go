@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"go/ast"
 	"go/parser"
 	"go/token"
 	"log"
@@ -27,8 +28,12 @@ func run() error {
 	if err != nil {
 		return err
 	}
+	dirFiles := make(map[string]map[string]*ast.File, len(dir))
+	for name, pkg := range dir {
+		dirFiles[name] = pkg.Files
+	}
 	imp := pry.JSImporter{
-		Dir: dir,
+		Dir: dirFiles,
 	}
 	spew.Dump(imp)
 	var buf bytes.Buffer

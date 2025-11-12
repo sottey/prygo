@@ -750,7 +750,7 @@ func TestDeclareAssignVar(t *testing.T) {
 	scope := NewScope()
 	scope.Set("a", []int{1})
 
-	out, err := scope.InterpretString(`var a, b int = 2, 3`)
+	_, err := scope.InterpretString(`var a, b int = 2, 3`)
 	if err != nil {
 		t.Error(err)
 	}
@@ -762,7 +762,7 @@ func TestDeclareAssignVar(t *testing.T) {
 		{"b", 3},
 	}
 	for _, td := range testData {
-		out, _ = scope.Get(td.v)
+		out, _ := scope.Get(td.v)
 		if !reflect.DeepEqual(td.want, out) {
 			t.Errorf("Expected %#v got %#v.", td.want, out)
 		}
@@ -775,12 +775,12 @@ func TestDeclareAssign(t *testing.T) {
 	scope := NewScope()
 	scope.Set("a", []int{1})
 
-	out, err := scope.InterpretString(`b := 2`)
+	_, err := scope.InterpretString(`b := 2`)
 	if err != nil {
 		t.Error(err)
 	}
 	expected := 2
-	out, _ = scope.Get("b")
+	out, _ := scope.Get("b")
 	if !reflect.DeepEqual(expected, out) {
 		t.Errorf("Expected %#v got %#v.", expected, out)
 	}
@@ -796,12 +796,12 @@ func TestAssign(t *testing.T) {
 		t.Fatal("expected error")
 	}
 
-	out, err := scope.InterpretString(`a = 2`)
+	_, err := scope.InterpretString(`a = 2`)
 	if err != nil {
 		t.Error(err)
 	}
 	expected := 2
-	out, _ = scope.Get("a")
+	out, _ := scope.Get("a")
 	if !reflect.DeepEqual(expected, out) {
 		t.Errorf("Expected %#v got %#v.", expected, out)
 	}

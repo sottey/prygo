@@ -172,7 +172,11 @@ func (g *Generator) InjectPry(filePath string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	os.WriteFile(filePath, ([]byte)(fileText), 0644)
+	errWriteFile := os.WriteFile(filePath, ([]byte)(fileText), 0644)
+	if errWriteFile != nil {
+		return "", errWriteFile
+	}
+
 	return filePath, nil
 }
 

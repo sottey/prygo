@@ -56,29 +56,32 @@ func (scope *Scope) SuggestionsGoCode(line string, index int) ([]string, error) 
 
 			subProcess := exec.Command("gocode", "autocomplete", filepath.Dir(name), strconv.Itoa(i))
 
-			stdin, err := subProcess.StdinPipe()
-			if err != nil {
-				return nil, err
+			stdin, errInPipe := subProcess.StdinPipe()
+			if errInPipe != nil {
+				return nil, errInPipe
 			}
 
-			stdout, err := subProcess.StdoutPipe()
-			if err != nil {
-				return nil, err
+			stdout, errOutPipe := subProcess.StdoutPipe()
+			if errOutPipe != nil {
+				return nil, errOutPipe
 			}
 			defer stdout.Close()
 
 			subProcess.Stderr = os.Stderr
 
-			if err = subProcess.Start(); err != nil {
-				return nil, err
+			if errStart := subProcess.Start(); errStart != nil {
+				return nil, errStart
 			}
 
-			io.WriteString(stdin, code)
+			_, errWrite := io.WriteString(stdin, code)
+			if errWrite != nil {
+				return nil, errWrite
+			}
 			stdin.Close()
 
-			output, err := io.ReadAll(bufio.NewReader(stdout))
-			if err != nil {
-				return nil, err
+			output, errReadAll := io.ReadAll(bufio.NewReader(stdout))
+			if errReadAll != nil {
+				return nil, errReadAll
 			}
 			rawSuggestions := strings.Split(string(output), "\n")[1:]
 			for _, suggestion := range rawSuggestions {
@@ -87,7 +90,10 @@ func (scope *Scope) SuggestionsGoCode(line string, index int) ([]string, error) 
 					suggestions = append(suggestions, trimmed)
 				}
 			}
-			subProcess.Wait()
+			errWait := subProcess.Wait()
+			if errWait != nil {
+				return nil, errWait
+			}
 
 			break
 		}
