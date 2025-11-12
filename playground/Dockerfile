@@ -1,13 +1,13 @@
 FROM golang:alpine as base
 
-RUN apk add --no-cache binutils git subversion mercurial nodejs npm
+RUN apk add --no-cache binutils git subversion mercurial nodejs npm curl
 RUN strip /usr/local/go/bin/go
 RUN rm /usr/local/go/bin/gofmt
 RUN rm -r /usr/local/go/src/cmd
 #RUN rm -r /usr/local/go/src/vendor
 RUN rm -r /usr/local/go/api
 RUN rm -r /usr/local/go/lib
-RUN cp /usr/local/go/misc/wasm/wasm_exec.js /tmp/wasm_exec.js
+RUN WASM_SRC=/usr/local/go/misc/wasm/wasm_exec.js; if [ -f "$WASM_SRC" ]; then cp "$WASM_SRC" /tmp/wasm_exec.js; else GO_VERSION=$(cat /usr/local/go/VERSION); curl -fsSL "https://raw.githubusercontent.com/golang/go/${GO_VERSION}/misc/wasm/wasm_exec.js" -o /tmp/wasm_exec.js; fi
 RUN rm -r /usr/local/go/misc
 RUN rm -r /usr/local/go/test
 RUN rm -r /usr/share
