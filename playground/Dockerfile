@@ -1,4 +1,4 @@
-FROM golang:alpine as base
+FROM golang:alpine AS base
 
 RUN apk add --no-cache binutils git subversion mercurial nodejs npm curl
 RUN strip /usr/local/go/bin/go
