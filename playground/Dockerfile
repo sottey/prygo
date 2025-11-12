@@ -1,6 +1,11 @@
+FROM node:18-alpine AS web-deps
+WORKDIR /app
+COPY playground/package.json playground/yarn.lock ./
+RUN npm install --global yarn && yarn install --production --frozen-lockfile
+
 FROM golang:alpine AS base
 
-RUN apk add --no-cache binutils git subversion mercurial nodejs npm icu-data-full
+RUN apk add --no-cache binutils git subversion mercurial
 RUN strip /usr/local/go/bin/go
 RUN rm /usr/local/go/bin/gofmt
 RUN rm -r /usr/local/go/src/cmd
@@ -21,7 +26,7 @@ WORKDIR /go/src/app
 COPY . .
 WORKDIR /go/src/app/playground
 
-RUN npm install --omit=dev --ignore-scripts
+COPY --from=web-deps /app/node_modules ./node_modules
 RUN mv /tmp/wasm_exec.js ./wasm_exec.js
 
 RUN CGO_ENABLED=0 go build -ldflags "-s -w" -o playground ./server
