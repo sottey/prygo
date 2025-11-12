@@ -1,12 +1,13 @@
 FROM golang:alpine as base
 
-RUN apk add binutils git subversion mercurial
+RUN apk add --no-cache binutils git subversion mercurial nodejs npm
 RUN strip /usr/local/go/bin/go
 RUN rm /usr/local/go/bin/gofmt
 RUN rm -r /usr/local/go/src/cmd
 #RUN rm -r /usr/local/go/src/vendor
 RUN rm -r /usr/local/go/api
 RUN rm -r /usr/local/go/lib
+RUN cp /usr/local/go/misc/wasm/wasm_exec.js /tmp/wasm_exec.js
 RUN rm -r /usr/local/go/misc
 RUN rm -r /usr/local/go/test
 RUN rm -r /usr/share
@@ -19,6 +20,9 @@ RUN strip /usr/local/go/pkg/tool/linux_amd64/*
 WORKDIR /go/src/app
 COPY . .
 WORKDIR /go/src/app/playground
+
+RUN npm install --production
+RUN mv /tmp/wasm_exec.js ./wasm_exec.js
 
 RUN CGO_ENABLED=0 go build -ldflags "-s -w" -o playground ./server
 RUN rm -rf /go/src/github.com /go/src/golang.org /go/bin
