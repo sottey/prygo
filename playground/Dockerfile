@@ -7,7 +7,7 @@ RUN rm -r /usr/local/go/src/cmd
 #RUN rm -r /usr/local/go/src/vendor
 RUN rm -r /usr/local/go/api
 RUN rm -r /usr/local/go/lib
-RUN WASM_SRC=/usr/local/go/misc/wasm/wasm_exec.js; if [ -f "$WASM_SRC" ]; then cp "$WASM_SRC" /tmp/wasm_exec.js; else GO_VERSION=$(go version | awk '{print $3}'); curl -fsSL "https://raw.githubusercontent.com/golang/go/${GO_VERSION}/misc/wasm/wasm_exec.js" -o /tmp/wasm_exec.js; fi
+RUN WASM_SRC=/usr/local/go/misc/wasm/wasm_exec.js; if [ -f "$WASM_SRC" ]; then cp "$WASM_SRC" /tmp/wasm_exec.js; else GO_VERSION=$(go version | awk '{print $3}' | sed 's/^go//'); curl -fsSL "https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz" -o /tmp/go.tgz && tar -xzf /tmp/go.tgz -C /tmp && cp /tmp/go/misc/wasm/wasm_exec.js /tmp/wasm_exec.js && rm -rf /tmp/go /tmp/go.tgz; fi
 RUN rm -r /usr/local/go/misc
 RUN rm -r /usr/local/go/test
 RUN rm -r /usr/share
