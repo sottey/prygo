@@ -1,7 +1,7 @@
 FROM node:18-alpine AS web-deps
 WORKDIR /app
 COPY playground/package.json playground/yarn.lock ./
-RUN npm install --global yarn && yarn install --production --frozen-lockfile
+RUN corepack enable && yarn install --production --frozen-lockfile
 
 FROM golang:alpine AS base
 
