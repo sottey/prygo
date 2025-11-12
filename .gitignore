@@ -1,3 +1,4 @@
+.gocache/**
 *.go.go
 *.zip
 fuzz/
@@ -5,4 +6,5 @@ fuzz/
 prygo-test*
 go-pry
 prygo
-state_tracking/***
+state_tracking/**
+dist/**
