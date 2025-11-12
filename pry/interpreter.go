@@ -9,6 +9,7 @@ import (
 	"go/token"
 	"path/filepath"
 	"reflect"
+	"runtime"
 	"strconv"
 	"strings"
 	"sync"
@@ -1167,6 +1168,15 @@ func (scope *Scope) ConfigureTypes(path string, line int) error {
 	scope.config = &types.Config{
 		FakeImportC: true,
 		Importer:    getImporter(),
+		Sizes:       types.SizesFor("gc", runtime.GOARCH),
+	}
+	if scope.config.Sizes == nil {
+		scope.config.Sizes = types.SizesFor(runtime.Compiler, runtime.GOARCH)
+	}
+
+	workDir := filepath.Dir(scope.path)
+	if err := ensureTempModule(workDir); err != nil {
+		return errors.Wrapf(err, "ensuring go.mod in %q", workDir)
 	}
 
 	// Parse the file containing this very example

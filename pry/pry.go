@@ -13,7 +13,7 @@ import (
 	"github.com/mgutz/ansi"
 )
 
-// Pry does nothing. It only exists so running code without go-pry doesn't throw an error.
+// Pry does nothing. It only exists so running code without prygo doesn't throw an error.
 func Pry(v ...interface{}) {
 }
 
@@ -68,7 +68,7 @@ func apply(
 	index := 0
 	r := rune(0)
 	for {
-		prompt := fmt.Sprintf("[%d] go-pry> ", currentPos)
+		prompt := fmt.Sprintf("[%d] prygo> ", currentPos)
 		fmt.Fprintf(out, "\r\033[K%s%s \033[0J\033[%dD", prompt, Highlight(line), len(line)-index+1)
 
 		promptWidth := len(prompt) + index

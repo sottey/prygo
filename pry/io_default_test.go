@@ -1,3 +1,4 @@
+//go:build !js
 // +build !js
 
 package pry
@@ -18,7 +19,7 @@ func TestHistory(t *testing.T) {
 	rand.Seed(time.Now().UnixNano())
 
 	history := &ioHistory{}
-	history.FileName = ".go-pry_history_test"
+	history.FileName = ".prygo_history_test"
 	history.FilePath = filepath.Join(os.TempDir(), history.FileName)
 
 	expected := []string{

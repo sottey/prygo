@@ -13,9 +13,10 @@ import (
 	"path/filepath"
 	"reflect"
 	"strings"
+	"sync"
 
-	"github.com/d4l3k/go-pry/pry"
 	"github.com/pkg/errors"
+	"github.com/sottey/prygo/pry"
 	"golang.org/x/tools/go/packages"
 )
 
@@ -49,7 +50,13 @@ func (g *Generator) ExecuteGoCmd(ctx context.Context, args []string, env []strin
 	}
 
 	cmd := exec.CommandContext(ctx, binary, args...)
-	cmd.Env = append(os.Environ(), env...)
+	cmdEnv := append([]string{}, os.Environ()...)
+	cmdEnv = append(cmdEnv, env...)
+	cmdEnv = append(cmdEnv, "GOWORK=off", "GO111MODULE=on")
+	if root := resolveModuleRoot(); root != "" {
+		cmdEnv = append(cmdEnv, "PRYGO_MODULE_ROOT="+root)
+	}
+	cmd.Env = cmdEnv
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	cmd.Stdin = os.Stdin
@@ -254,7 +261,7 @@ func (g *Generator) GetExports(importName string, files []*ast.File, added map[s
 
 // GenerateFile generates a injected file.
 func (g *Generator) GenerateFile(imports []string, extraStatements, path string) error {
-	file := "package main\nimport (\n\t\"github.com/d4l3k/go-pry/pry\"\n\n"
+	file := "package main\nimport (\n\t\"github.com/sottey/prygo/pry\"\n\n"
 	for _, imp := range imports {
 		if len(imp) == 0 {
 			continue
@@ -369,6 +376,31 @@ func (g *Generator) handleStatement(vars []string, s ast.Stmt) []string {
 		g.Debug("Unknown %T\n", stmt)
 	}
 	return vars
+}
+
+var (
+	moduleRootOnce sync.Once
+	moduleRootPath string
+)
+
+func resolveModuleRoot() string {
+	moduleRootOnce.Do(func() {
+		moduleRootPath = detectModuleRoot()
+	})
+	return moduleRootPath
+}
+
+func detectModuleRoot() string {
+	cmd := exec.Command("go", "env", "GOMOD")
+	out, err := cmd.Output()
+	if err != nil {
+		return ""
+	}
+	gomod := strings.TrimSpace(string(out))
+	if gomod == "" || gomod == os.DevNull {
+		return ""
+	}
+	return filepath.Dir(gomod)
 }
 
 func (g *Generator) handleIfStmt(vars []string, stmt *ast.IfStmt) []string {

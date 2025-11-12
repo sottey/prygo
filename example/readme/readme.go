@@ -1,6 +1,6 @@
 package main
 
-import "github.com/d4l3k/go-pry/pry"
+import "github.com/sottey/prygo/pry"
 
 func main() {
 	a := 1

@@ -10,8 +10,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/d4l3k/go-pry/generate"
 	"github.com/pkg/errors"
+	"github.com/sottey/prygo/generate"
 )
 
 func main() {
@@ -37,7 +37,7 @@ func run() error {
 	imports := flag.String("i", "fmt,math", "packages to import, comma seperated")
 	revert := flag.Bool("r", true, "whether to revert changes on exit")
 	execute := flag.String("e", "", "statements to execute")
-	generatePath := flag.String("generate", "", "the path to generate a go-pry injected file - EXPERIMENTAL")
+	generatePath := flag.String("generate", "", "the path to generate a prygo injected file - EXPERIMENTAL")
 	debug := flag.Bool("d", false, "display debug statements")
 
 	flag.CommandLine.Usage = func() {
@@ -45,11 +45,11 @@ func run() error {
 			log.Fatal(err)
 		}
 		fmt.Println("----")
-		fmt.Println("go-pry is an interactive REPL and wrapper around the go command.")
-		fmt.Println("You can execute go commands as normal and go-pry will take care of generating the pry code.")
-		fmt.Println("Running go-pry with no arguments will drop you into an interactive REPL.")
+		fmt.Println("prygo is an interactive REPL and wrapper around the go command.")
+		fmt.Println("You can execute go commands as normal and prygo will take care of generating the pry code.")
+		fmt.Println("Running prygo with no arguments will drop you into an interactive REPL.")
 		flag.PrintDefaults()
-		fmt.Println("  revert: cleans up go-pry generated files if not automatically done")
+		fmt.Println("  revert: cleans up prygo generated files if not automatically done")
 	}
 	flag.Parse()
 

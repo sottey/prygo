@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/d4l3k/go-pry/pry"
 	"time"
+
+	"github.com/sottey/prygo/pry"
 )
 
 func prying() {

@@ -2,4 +2,6 @@
 *.zip
 fuzz/
 *.coverprofile
-go-pry-test*
+prygo-test*
+go-pry
+prygo

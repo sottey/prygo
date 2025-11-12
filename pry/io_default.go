@@ -1,3 +1,4 @@
+//go:build !js
 // +build !js
 
 package pry
@@ -14,7 +15,7 @@ import (
 
 var readFile = ioutil.ReadFile
 
-var historyFile = ".go-pry_history"
+var historyFile = ".prygo_history"
 
 type ioHistory struct {
 	FileName string

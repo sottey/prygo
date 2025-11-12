@@ -1,5 +1,5 @@
 {
-  "name": "go-pry",
+  "name": "prygo",
   "type": "docker",
   "alias": "gopry.rice.sh",
   "files": [

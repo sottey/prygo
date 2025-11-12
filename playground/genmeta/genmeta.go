@@ -9,8 +9,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/d4l3k/go-pry/pry"
 	"github.com/davecgh/go-spew/spew"
+	"github.com/sottey/prygo/pry"
 )
 
 func main() {
@@ -38,7 +38,7 @@ func run() error {
 	}
 	if err := ioutil.WriteFile("meta.go", []byte(
 		`package main
-import "github.com/d4l3k/go-pry/pry"
+import "github.com/sottey/prygo/pry"
 func init(){
 	pry.InternalSetImports(`+"`"+buf.String()+"`"+`)
 }`,

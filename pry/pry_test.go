@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"github.com/cenkalti/backoff"
-	"github.com/d4l3k/go-pry/pry/safebuffer"
 	"github.com/pkg/errors"
+	"github.com/sottey/prygo/pry/safebuffer"
 )
 
 func TestCLIBasicStatement(t *testing.T) {
@@ -119,7 +119,7 @@ func testPryApply(t testing.TB) *testPryEnv {
 	}
 	log.Printf("cwd %+v", wd)
 
-	dir, err := ioutil.TempDir(wd, "go-pry-test")
+	dir, err := ioutil.TempDir(wd, "prygo-test")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -134,7 +134,7 @@ func testPryApply(t testing.TB) *testPryEnv {
 	if _, err := file.Write([]byte(
 		`package main
 
-import "github.com/d4l3k/go-pry/pry"
+import "github.com/sottey/prygo/pry"
 
 func main() {
 	pry.Pry()

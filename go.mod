@@ -1,4 +1,4 @@
-module github.com/d4l3k/go-pry
+module github.com/sottey/prygo
 
 go 1.16
 

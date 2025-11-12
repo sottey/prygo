@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/d4l3k/go-pry/pry"
+	"github.com/sottey/prygo/pry"
 )
 
 func main() {

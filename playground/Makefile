@@ -4,9 +4,9 @@ build: wasm_exec.js
 	go install -v ..
 	@rm -r bundles
 	mkdir -p bundles
-	go-pry -generate="bundles/main.go" -i="fmt,log,math" -e='log.Println("Hello world!")'
+	prygo -generate="bundles/main.go" -i="fmt,log,math" -e='log.Println("Hello world!")'
 	GOOS=js GOARCH=wasm go build -v -ldflags "-s -w" -o bundles/main.wasm bundles/main.go
-	go-pry -generate="bundles/stdlib.go" -i="$(shell tr '\n' ',' < packages.txt)" -e='log.Println("Hello world!")'
+	prygo -generate="bundles/stdlib.go" -i="$(shell tr '\n' ',' < packages.txt)" -e='log.Println("Hello world!")'
 	GOOS=js GOARCH=wasm go build -v -ldflags "-s -w" -o bundles/stdlib.wasm bundles/stdlib.go
 
 .PHONY: run
