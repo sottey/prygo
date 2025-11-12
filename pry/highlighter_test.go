@@ -1,7 +1,7 @@
 package pry
 
 import (
-	"io/ioutil"
+	"os"
 	"regexp"
 	"testing"
 )
@@ -10,7 +10,7 @@ import (
 func TestHighlightSafe(t *testing.T) {
 	t.Parallel()
 
-	fileBytes, err := ioutil.ReadFile("../example/file/file.go")
+	fileBytes, err := os.ReadFile("../example/file/file.go")
 	if err != nil {
 		t.Error(err)
 	}

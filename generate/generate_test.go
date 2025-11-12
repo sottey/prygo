@@ -45,3 +45,11 @@ func fileExists(filePath string) bool {
 	_, err := os.Stat(filePath)
 	return !os.IsNotExist(err)
 }
+
+func TestImportUsageExpressions(t *testing.T) {
+	g := NewGenerator(false)
+	exprs := g.importUsageExpressions([]string{"fmt", "math"})
+	if len(exprs) == 0 {
+		t.Fatalf("expected usage expressions for stdlib imports, got none")
+	}
+}

@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"crypto/sha1"
 	"encoding/hex"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -32,7 +31,7 @@ func run() error {
 		return err
 	}
 	for _, fpath := range files {
-		body, err := ioutil.ReadFile(fpath)
+		body, err := os.ReadFile(fpath)
 		if err != nil {
 			return err
 		}
@@ -46,7 +45,7 @@ func run() error {
 			expr := bytes.TrimSpace(body[match[2]:match[3]])
 			hash := sha1.Sum(expr)
 			file := hex.EncodeToString(hash[:])
-			if err := ioutil.WriteFile(filepath.Join(out, file), expr, 0644); err != nil {
+			if err := os.WriteFile(filepath.Join(out, file), expr, 0644); err != nil {
 				return err
 			}
 

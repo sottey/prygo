@@ -2,7 +2,6 @@ package pry
 
 import (
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"path"
@@ -119,7 +118,7 @@ func testPryApply(t testing.TB) *testPryEnv {
 	}
 	log.Printf("cwd %+v", wd)
 
-	dir, err := ioutil.TempDir(wd, "prygo-test")
+	dir, err := os.MkdirTemp(wd, "prygo-test")
 	if err != nil {
 		t.Fatal(err)
 	}

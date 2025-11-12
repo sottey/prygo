@@ -1,3 +1,4 @@
+//go:build js
 // +build js
 
 package pry
@@ -5,7 +6,6 @@ package pry
 import (
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"path/filepath"
 	"syscall/js"
 )
@@ -32,7 +32,7 @@ func readFile(path string) ([]byte, error) {
 		return nil
 	})
 	js.Global().Call("fetch", path).Call("then", respCB)
-	return ioutil.ReadAll(r)
+	return io.ReadAll(r)
 }
 
 type browserHistory struct {

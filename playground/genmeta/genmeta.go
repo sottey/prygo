@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"go/parser"
 	"go/token"
-	"io/ioutil"
 	"log"
 	"os"
 
@@ -36,7 +35,7 @@ func run() error {
 	if err := json.NewEncoder(&buf).Encode(imp); err != nil {
 		return err
 	}
-	if err := ioutil.WriteFile("meta.go", []byte(
+	if err := os.WriteFile("meta.go", []byte(
 		`package main
 import "github.com/sottey/prygo/pry"
 func init(){

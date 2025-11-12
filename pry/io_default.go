@@ -5,15 +5,15 @@ package pry
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"log"
+	"os"
 	"path"
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
 )
 
-var readFile = ioutil.ReadFile
+var readFile = os.ReadFile
 
 var historyFile = ".prygo_history"
 
@@ -40,7 +40,7 @@ func NewHistory() (*ioHistory, error) {
 
 // Load unmarshal history file into history's records
 func (h *ioHistory) Load() error {
-	body, err := ioutil.ReadFile(h.FilePath)
+	body, err := os.ReadFile(h.FilePath)
 	if err != nil {
 		return errors.Wrapf(err, "History file not found")
 	}
@@ -59,7 +59,7 @@ func (h ioHistory) Save() error {
 	if err != nil {
 		return errors.Wrapf(err, "error marshaling history")
 	}
-	if err := ioutil.WriteFile(h.FilePath, body, 0755); err != nil {
+	if err := os.WriteFile(h.FilePath, body, 0755); err != nil {
 		return errors.Wrapf(err, "error writing history to the file")
 	}
 

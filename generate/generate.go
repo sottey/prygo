@@ -6,7 +6,7 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
-	"io/ioutil"
+	"go/types"
 	"log"
 	"os"
 	"os/exec"
@@ -30,7 +30,7 @@ func NewGenerator(debug bool) *Generator {
 	return &Generator{
 		debug: debug,
 		Config: packages.Config{
-			Mode: packages.NeedName | packages.NeedSyntax,
+			Mode: packages.NeedName | packages.NeedSyntax | packages.NeedTypes | packages.NeedTypesInfo,
 		},
 	}
 }
@@ -138,7 +138,7 @@ func (g *Generator) InjectPry(filePath string) (string, error) {
 		vars = g.extractVariables(vars, f.Body.List)
 	}
 
-	fileTextBytes, err := ioutil.ReadFile(filePath)
+	fileTextBytes, err := os.ReadFile(filePath)
 	if err != nil {
 		return "", nil
 	}
@@ -172,7 +172,7 @@ func (g *Generator) InjectPry(filePath string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	ioutil.WriteFile(filePath, ([]byte)(fileText), 0644)
+	os.WriteFile(filePath, ([]byte)(fileText), 0644)
 	return filePath, nil
 }
 
@@ -211,6 +211,10 @@ func (g *Generator) GetExports(importName string, files []*ast.File, added map[s
 						isType = true
 						scope.Set(obj.Name, typ)
 
+					case *ast.InterfaceType:
+						isType = true
+						scope.Set(obj.Name, typ)
+
 					default:
 						out, err := scope.Interpret(stmt.Type)
 						if err != nil {
@@ -238,6 +242,8 @@ func (g *Generator) GetExports(importName string, files []*ast.File, added map[s
 							vars += fmt.Sprintf("pry.Type(%s(%s))", path, val)
 						case *ast.StructType:
 							vars += fmt.Sprintf("pry.Type(%s{})", path)
+						case *ast.InterfaceType:
+							vars += fmt.Sprintf("pry.Type((%s)(nil))", path)
 						default:
 							log.Fatalf("got unknown type: %T %+v", out, out)
 						}
@@ -259,28 +265,156 @@ func (g *Generator) GetExports(importName string, files []*ast.File, added map[s
 	return vars, nil
 }
 
-// GenerateFile generates a injected file.
-func (g *Generator) GenerateFile(imports []string, extraStatements, path string) error {
-	file := "package main\nimport (\n\t\"github.com/sottey/prygo/pry\"\n\n"
+func (g *Generator) importUsageExpressions(imports []string) []string {
+	seen := make(map[string]struct{})
+	expressions := make([]string, 0, len(imports))
 	for _, imp := range imports {
+		imp = strings.TrimSpace(imp)
 		if len(imp) == 0 {
 			continue
 		}
-		file += fmt.Sprintf("\t%#v\n", imp)
+		clean := strings.Trim(imp, `"`)
+		if len(clean) == 0 {
+			continue
+		}
+		if _, ok := seen[clean]; ok {
+			continue
+		}
+		seen[clean] = struct{}{}
+		expr, err := g.importUsageExpression(clean)
+		if err != nil {
+			g.Debug("failed to prime import %q: %v", clean, err)
+			continue
+		}
+		if len(expr) > 0 {
+			expressions = append(expressions, expr)
+		}
 	}
-	file += ")\nfunc main() {\n\t" + extraStatements + "\n\tpry.Pry()\n}\n"
+	return expressions
+}
 
-	if err := ioutil.WriteFile(path, []byte(file), 0644); err != nil {
+func (g *Generator) importUsageExpression(importPath string) (string, error) {
+	cfg := g.Config
+	pkgs, err := packages.Load(&cfg, importPath)
+	if err != nil {
+		return "", err
+	}
+	if len(pkgs) == 0 {
+		return "", errors.Errorf("no package data for %q", importPath)
+	}
+	pkg := pkgs[0]
+	name, isType := pickAnyExport(pkg)
+	if name == "" {
+		return "", nil
+	}
+	alias := pkg.Name
+	if isType {
+		return fmt.Sprintf("(*%s.%s)(nil)", alias, name), nil
+	}
+	return fmt.Sprintf("%s.%s", alias, name), nil
+}
+
+func pickAnyExport(pkg *packages.Package) (string, bool) {
+	if pkg.Types != nil {
+		if name, isType := pickExportFromTypes(pkg.Types.Scope()); name != "" {
+			return name, isType
+		}
+	}
+	return pickAnyExportFromSyntax(pkg.Syntax)
+}
+
+func pickExportFromTypes(scope *types.Scope) (string, bool) {
+	if scope == nil {
+		return "", false
+	}
+	for _, name := range scope.Names() {
+		obj := scope.Lookup(name)
+		if obj == nil || !obj.Exported() {
+			continue
+		}
+		switch obj.(type) {
+		case *types.TypeName:
+			return name, true
+		case *types.Func, *types.Var, *types.Const:
+			return name, false
+		}
+	}
+	return "", false
+}
+
+func pickAnyExportFromSyntax(files []*ast.File) (string, bool) {
+	for _, file := range files {
+		for name, obj := range file.Scope.Objects {
+			if !ast.IsExported(name) {
+				continue
+			}
+			switch obj.Kind {
+			case ast.Typ:
+				return name, true
+			case ast.Fun, ast.Var, ast.Con:
+				return name, false
+			}
+		}
+	}
+	return "", false
+}
+
+// GenerateFile generates a injected file.
+func (g *Generator) GenerateFile(imports []string, extraStatements, path string) error {
+	trimmed := make([]string, 0, len(imports))
+	for _, imp := range imports {
+		imp = strings.TrimSpace(imp)
+		if len(imp) == 0 {
+			continue
+		}
+		trimmed = append(trimmed, imp)
+	}
+
+	useExprs := g.importUsageExpressions(trimmed)
+
+	var b strings.Builder
+	b.WriteString("package main\n")
+	b.WriteString("import (\n\t\"github.com/sottey/prygo/pry\"\n\n")
+	for _, imp := range trimmed {
+		b.WriteString(fmt.Sprintf("\t%#v\n", imp))
+	}
+	b.WriteString(")\n")
+
+	if len(useExprs) > 0 {
+		b.WriteString("\nvar (\n")
+		for _, expr := range useExprs {
+			b.WriteString("\t_ = ")
+			b.WriteString(expr)
+			b.WriteString("\n")
+		}
+		b.WriteString(")\n")
+	}
+
+	b.WriteString("\nfunc main() {\n")
+	if strings.TrimSpace(extraStatements) != "" {
+		b.WriteString("\t")
+		b.WriteString(extraStatements)
+		b.WriteString("\n")
+	}
+	b.WriteString("\tpry.Pry()\n}\n")
+
+	if err := os.WriteFile(path, []byte(b.String()), 0644); err != nil {
 		return err
 	}
 
-	_, err := g.InjectPry(path)
-	return err
+	modifiedPath, err := g.InjectPry(path)
+	if err != nil {
+		return err
+	}
+	if modifiedPath == "" {
+		return errors.Errorf("generated file %s does not contain a pry call", path)
+	}
+	return nil
 }
 
 // GenerateAndExecuteFile generates and executes a temp file with the given imports
 func (g *Generator) GenerateAndExecuteFile(ctx context.Context, imports []string, extraStatements string) error {
-	dir, err := ioutil.TempDir("", "pry")
+	dir, err := os.MkdirTemp("", "pry")
 	if err != nil {
 		return err
 	}

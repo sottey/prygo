@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"go/ast"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -77,7 +76,7 @@ func (scope *Scope) SuggestionsGoCode(line string, index int) ([]string, error) 
 			io.WriteString(stdin, code)
 			stdin.Close()
 
-			output, err := ioutil.ReadAll(bufio.NewReader(stdout))
+			output, err := io.ReadAll(bufio.NewReader(stdout))
 			if err != nil {
 				return nil, err
 			}

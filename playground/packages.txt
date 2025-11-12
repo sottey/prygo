@@ -6,7 +6,6 @@ context
 html
 html/template
 io
-io/ioutil
 fmt
 encoding/gob
 encoding/binary

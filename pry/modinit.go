@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"runtime/debug"
 	"strings"
 	"sync"
@@ -26,6 +27,8 @@ type moduleMetadata struct {
 	path        string
 	version     string
 	replacePath string
+	goVersion   string
+	toolchain   string
 }
 
 // ensureTempModule writes a go.mod into dir when neither the directory nor any
@@ -43,7 +46,12 @@ func ensureTempModule(dir string) error {
 	meta := getModuleMetadata()
 	var buf bytes.Buffer
 	fmt.Fprintf(&buf, "module %s\n\n", tempModuleName)
-	fmt.Fprintln(&buf, "go 1.22")
+	goVer, toolchain := moduleLanguageSettings(meta)
+	fmt.Fprintf(&buf, "go %s\n", goVer)
+	if toolchain != "" {
+		fmt.Fprintf(&buf, "toolchain %s\n", toolchain)
+	}
+	fmt.Fprintln(&buf)
 	if meta.path != "" && meta.version != "" {
 		fmt.Fprintf(&buf, "\nrequire %s %s\n", meta.path, meta.version)
 		if meta.replacePath != "" {
@@ -90,8 +98,89 @@ func getModuleMetadata() moduleMetadata {
 		if dir := findLocalModuleDir(modulePath); dir != "" {
 			moduleInfo.replacePath = dir
 		}
+		moduleInfo.goVersion, moduleInfo.toolchain = detectModuleGoSettings(moduleInfo.replacePath)
 	})
 	return moduleInfo
+}
+
+func moduleLanguageSettings(meta moduleMetadata) (goVersion, toolchain string) {
+	goVersion, toolchain = meta.goVersion, meta.toolchain
+	if goVersion == "" {
+		goVersion, toolchain = runtimeGoSettings()
+	}
+	if goVersion == "" {
+		goVersion = "1.22"
+	}
+	return
+}
+
+func detectModuleGoSettings(dir string) (goVersion, toolchain string) {
+	if dir == "" {
+		return runtimeGoSettings()
+	}
+	path := filepath.Join(dir, "go.mod")
+	goVersion, toolchain = parseGoModDirectives(path)
+	if goVersion == "" {
+		return runtimeGoSettings()
+	}
+	return
+}
+
+func parseGoModDirectives(path string) (goVersion, toolchain string) {
+	file, err := os.Open(path)
+	if err != nil {
+		return "", ""
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if line == "" || strings.HasPrefix(line, "//") {
+			continue
+		}
+		if strings.HasPrefix(line, "module ") {
+			continue
+		}
+		if strings.HasPrefix(line, "go ") && goVersion == "" {
+			goVersion = strings.TrimSpace(strings.TrimPrefix(line, "go "))
+			continue
+		}
+		if strings.HasPrefix(line, "toolchain ") && toolchain == "" {
+			toolchain = strings.TrimSpace(strings.TrimPrefix(line, "toolchain "))
+			continue
+		}
+		if goVersion != "" && toolchain != "" {
+			break
+		}
+	}
+	return goVersion, toolchain
+}
+
+func runtimeGoSettings() (goVersion, toolchain string) {
+	version := runtime.Version()
+	if strings.HasPrefix(version, "go") {
+		version = strings.TrimPrefix(version, "go")
+	}
+	if version == "" {
+		return "", ""
+	}
+	clean := trimVersionSuffix(version)
+	if clean == "" {
+		return "", ""
+	}
+	goVersion = clean
+	toolchain = "go" + clean
+	return
+}
+
+func trimVersionSuffix(version string) string {
+	for i, r := range version {
+		if r != '.' && (r < '0' || r > '9') {
+			return version[:i]
+		}
+	}
+	return version
 }
 
 func findLocalModuleDir(modulePath string) string {
