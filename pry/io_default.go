@@ -42,6 +42,10 @@ func NewHistory() (*ioHistory, error) {
 func (h *ioHistory) Load() error {
 	body, err := os.ReadFile(h.FilePath)
 	if err != nil {
+		if os.IsNotExist(err) {
+			h.Records = nil
+			return nil
+		}
 		return errors.Wrapf(err, "History file not found")
 	}
 	var records []string
