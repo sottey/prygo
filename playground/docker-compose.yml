@@ -1,0 +1,13 @@
+services:
+  playground:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - playground_bundles:/go/src/app/bundles
+    restart: unless-stopped
+
+volumes:
+  playground_bundles:
