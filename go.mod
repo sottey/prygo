@@ -1,7 +1,7 @@
 module github.com/sottey/prygo
 
 // Pinned via env
-go 1.25
+go 1.23
 
 require (
 	github.com/cenkalti/backoff v2.2.1+incompatible
