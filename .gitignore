@@ -1,3 +1,31 @@
+# ============================================
+# Go build artifacts
+# ============================================
+# Binaries (default `go build` output)
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Go cache / test output
+*.test
+*.out
+
+# Build output directories
+bin/
+cmd/*/bin/
+build/
+dist/
+
+# Go workspaces (Go 1.18+)
+go.work
+go.work.sum
+
+
+# ============================================
+# Your project specific files
+# ============================================
 .gocache/**
 *.go.go
 *.zip
@@ -8,3 +36,49 @@ go-pry
 prygo
 state_tracking/**
 dist/**
+
+# ============================================
+# macOS junk
+# ============================================
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# macOS metadata directories
+__MACOSX/
+
+
+# ============================================
+# Linux junk
+# ============================================
+.Trash-*
+.nfs*
+
+
+# ============================================
+# Editor / IDE junk
+# ============================================
+# VS Code
+.vscode/
+
+# JetBrains GoLand
+.idea/
+
+# Sublime
+*.sublime-workspace
+*.sublime-project
+
+# Vim / NeoVim
+*.swp
+*.swo
+*.swm
+
+# Emacs
+*~
+
+# ============================================
+# Logs / temp files
+# ============================================
+*.log
+*.tmp
+*.cache/
